@@ -1,8 +1,8 @@
 public class Driver {
-  public static void main(String[] args){
-    CircularBuffer buf = new CircularBuffer(12);
-    buf.put(Byte.valueOf((byte) 50));
-    Byte item = buf.get();
-    System.out.println(item);
-  }
-}
+	public static void main(String[] args) {
+		CircularBuffer buf = new CircularBuffer(Integer.parseInt(args[3]));
+		int maxCopy = Integer.parseInt(args[2]);
+		new Producer(buf, args[0], maxCopy);
+		new Consumer(buf, args[1], maxCopy);
+	}
+}	
