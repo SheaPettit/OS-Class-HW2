@@ -18,19 +18,28 @@ public class Producer implements Runnable {
 	public void run() {
 		try (FileInputStream inStream = new FileInputStream(file)) {
 			ThreadLocalRandom rand = ThreadLocalRandom.current();
-			int item = inStream.read();
-			while (item > -1) {
-				int randomNum = rand.nextInt(maxCopy) + 1;
-				for (int i = 0; i < randomNum; i++) {
-					if (item == -1)
+			byte[] items = null;
+			int randomNum;
+			int numItems;
+			while (true) {
+				randomNum = rand.nextInt(maxCopy) + 1;
+				if(b.canPut(randomNum)) {
+					items = new byte[randomNum];
+					numItems = inStream.read(items);
+					if(numItems == -1) {
 						break;
-					if (!b.put(Byte.valueOf((byte) item)))
+					}
+					if(numItems < randomNum) {
+						byte[] cutItems = new byte[numItems];
+						for(int i = 0; i < numItems; i++)
+							cutItems[i] = items[i];
+						b.put(cutItems, numItems);
 						break;
-					item = inStream.read();
+					}
+					b.put(items, randomNum);
 				}
 			}
 			b.donePutting();
-			b.put(null);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

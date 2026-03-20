@@ -25,21 +25,16 @@ public class Consumer implements Runnable {
 		}
 		try (FileOutputStream outStream = new FileOutputStream(file)) {
 			ThreadLocalRandom rand = ThreadLocalRandom.current();
-			Byte item;
+			int randomNum;
 			while (!b.getDonePutting()) {
-				int randomNum = rand.nextInt(maxCopy) + 1;
-				for (int i = 0; i < randomNum; i++) {
-					item = b.get();
-					if (item == null)
-						break;
-					outStream.write(item);
+				randomNum = rand.nextInt(maxCopy) + 1;
+				if(b.canGet(randomNum)) {
+					outStream.write(b.get(randomNum));
 				}
 			}
-			item = b.get();
-			while(item != null) {
-				outStream.write(item);
-				item = b.get();
-			}
+			byte[] items = b.getRemaining();
+			if(items != null)
+				outStream.write(items);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

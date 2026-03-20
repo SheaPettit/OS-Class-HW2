@@ -1,7 +1,7 @@
 import java.util.concurrent.Semaphore;
 
 public class CircularBuffer {
-	private Byte[] buffer;
+	private byte[] buffer;
 	private int size;
 	private Semaphore putSem;
 	private Semaphore getSem;
@@ -10,7 +10,7 @@ public class CircularBuffer {
 	private boolean donePutting;
 
 	public CircularBuffer(int bufferSize) {
-		buffer = new Byte[bufferSize];
+		buffer = new byte[bufferSize];
 		putSem = new Semaphore(bufferSize);
 		getSem = new Semaphore(0);
 		nextPut = 0;
@@ -19,34 +19,57 @@ public class CircularBuffer {
 		donePutting = false;
 	}
 
-	public boolean put(Byte item) {
-		try {
-			putSem.acquire();
-		} catch (InterruptedException e) {
-			return false;
+	public boolean canPut(int num) {
+		if(num <= putSem.availablePermits()) {
+			return true;
 		}
-		buffer[nextPut] = item;
-		if (++nextPut >= size)
-			nextPut = 0;
-		getSem.release();
-		return true;
+		return false;
 	}
 
-	public Byte get() {
+	public void put(byte[] items, int num) {
 		try {
-			getSem.acquire();
+			putSem.acquire(num);
 		} catch (InterruptedException e) {
-			return null;
+			e.printStackTrace();
 		}
-		Byte returnItem = buffer[nextGet++];
-		if (nextGet >= size)
-			nextGet = 0;
-		putSem.release();
-		return returnItem;
+		for(int i = 0; i < num; i++) {
+			buffer[nextPut] = items[i];
+			if (++nextPut >= size)
+				nextPut = 0;
+		}
+		getSem.release(num);
+	}
+
+	public boolean canGet(int num) {
+		if(num <= getSem.availablePermits())
+			return true;
+		return false;
+	}
+
+	public byte[] get(int num) {
+		if(num == 0)
+			return null;
+		try {
+			getSem.acquire(num);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		byte[] items = new byte[num];
+		for(int i = 0; i < num; i++) {
+			items[i] = buffer[nextGet++];
+			if (nextGet >= size)
+				nextGet = 0;
+		}
+		putSem.release(num);
+		return items;
 	}
 
 	public int getSize() {
 		return size;
+	}
+	
+	public byte[] getRemaining() {
+		return get(getSem.availablePermits());
 	}
 
 	public boolean getDonePutting() {
