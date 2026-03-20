@@ -14,9 +14,10 @@ public class Producer implements Runnable {
     try (Scanner scan = new Scanner(file)){
     	int bufferSize = b.getSize();
     	ThreadLocalRandom rand = ThreadLocalRandom.current();
+    	Byte item;
     	while(scan.hasNextByte()) {
     		for(int i = 0; i < rand.nextInt(bufferSize) + 1; i++){
-    			
+    			scan.nextByte();
     		}
     	}
     } catch (FileNotFoundException e) {
