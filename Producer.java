@@ -30,10 +30,7 @@ public class Producer implements Runnable {
 						break;
 					}
 					if(numItems < randomNum) {
-						byte[] cutItems = new byte[numItems];
-						for(int i = 0; i < numItems; i++)
-							cutItems[i] = items[i];
-						b.put(cutItems, numItems);
+						b.put(items, numItems);
 						break;
 					}
 					b.put(items, randomNum);
