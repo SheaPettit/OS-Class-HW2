@@ -13,7 +13,6 @@ public class Producer implements Runnable {
 		this.b = b;
 		this.file = new File(file);
 		this.maxCopy = maxCopy;
-		new Thread(this, "Producer").start();
 	}
 
 	public void run() {
@@ -22,7 +21,6 @@ public class Producer implements Runnable {
 			int item = inStream.read();
 			while (item > -1) {
 				int randomNum = rand.nextInt(maxCopy) + 1;
-				System.out.println("Random Number In Producer: " + randomNum);
 				for (int i = 0; i < randomNum; i++) {
 					if (item == -1)
 						break;
@@ -32,6 +30,7 @@ public class Producer implements Runnable {
 				}
 			}
 			b.donePutting();
+			b.put(null);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

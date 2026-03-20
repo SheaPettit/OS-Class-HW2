@@ -16,7 +16,7 @@ public class CircularBuffer {
 		nextPut = 0;
 		nextGet = 0;
 		size = bufferSize;
-		System.out.println("Buffer Size: " + size);
+		donePutting = false;
 	}
 
 	public boolean put(Byte item) {
@@ -29,7 +29,6 @@ public class CircularBuffer {
 		if (++nextPut >= size)
 			nextPut = 0;
 		getSem.release();
-		System.out.println("Read byte from old file. NextPut: " + nextPut + " Get: " + getSem.availablePermits() + " Put: " + putSem.availablePermits());
 		return true;
 	}
 
@@ -43,7 +42,6 @@ public class CircularBuffer {
 		if (nextGet >= size)
 			nextGet = 0;
 		putSem.release();
-		System.out.println("Wrote byte to new file. NextGet: " + nextGet + " Get: " + getSem.availablePermits() + " Put: " + putSem.availablePermits());
 		return returnItem;
 	}
 
@@ -52,7 +50,6 @@ public class CircularBuffer {
 	}
 
 	public boolean getDonePutting() {
-		System.out.println("Done Putting");
 		return donePutting;
 	}
 

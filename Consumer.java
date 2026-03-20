@@ -13,8 +13,6 @@ public class Consumer implements Runnable {
 		this.b = b;
 		this.file = new File(file);
 		this.maxCopy = maxCopy;
-		System.out.println("Max Copy: " + maxCopy);
-		new Thread(this, "Producer").start();
 	}
 
 	public void run() {
@@ -30,9 +28,7 @@ public class Consumer implements Runnable {
 			Byte item;
 			while (!b.getDonePutting()) {
 				int randomNum = rand.nextInt(maxCopy) + 1;
-				System.out.println("Random Number In Consumer: " + randomNum);
 				for (int i = 0; i < randomNum; i++) {
-
 					item = b.get();
 					if (item == null)
 						break;
